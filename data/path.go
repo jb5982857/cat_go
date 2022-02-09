@@ -1,3 +1,4 @@
 package data
 
-const Login = "/cat/login" //登录
+const Group = "/cat"
+const Login = "/login" //登录

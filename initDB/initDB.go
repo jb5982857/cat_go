@@ -9,11 +9,11 @@ import (
 var Db *sql.DB
 
 func init() {
-	Db, err := sql.Open("mysql", "root:1234@tcp(rm-2vc000gt370tk69pj4o.mysql.cn-chengdu.rds.aliyuncs.com:3306)/cat")
+	database, err := sql.Open("mysql", "jb5982857:wobuailq99@tcp(rm-2vc000gt370tk69pj4o.mysql.cn-chengdu.rds.aliyuncs.com:3306)/cat")
 	if err != nil {
 		log.Panicln("err:", err.Error())
 	}
-
-	Db.SetMaxOpenConns(10)
-	Db.SetMaxIdleConns(10)
+	Db = database
+	database.SetMaxOpenConns(10)
+	database.SetMaxIdleConns(10)
 }

@@ -1,18 +1,15 @@
 package main
 
 import (
-	account "cat/api"
-	"cat/data"
+	"cat/routers"
 	"fmt"
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	router := gin.Default()
-	router.POST(data.Login, account.Login)
-	err := router.Run(":8090")
+	r := routers.Router()
+	err := r.Run(":8090")
 	if err != nil {
-		fmt.Printf("router start err %s", err.Error())
-		return
+		fmt.Printf("routers start err %s", err.Error())
+		panic("start error")
 	}
 }

@@ -9,15 +9,15 @@ import (
 )
 
 type LoginRequest struct {
-	PhoneNum int64 `json:"phone_num"`
-	code     int   `json:"code"`
+	PhoneNum int `json:"phone_num"`
+	Code     int `json:"code"`
 }
 
 func Login(c *gin.Context) {
-	var requestData LoginRequest
-	err := c.BindJSON(requestData)
+	requestData := LoginRequest{}
+	err := c.BindJSON(&requestData)
 	if err != nil {
-		fmt.Println("login request error")
+		fmt.Println("login request error " + err.Error())
 		c.JSON(http.StatusOK, data.BaseResponseData{
 			Code: data.CodeParamError,
 			Msg:  "参数错误",
@@ -25,5 +25,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	initDB.Db.
+	_, e := initDB.Db.Exec("insert into account(phone) values (?);", requestData.PhoneNum)
+	if e != nil {
+		fmt.Println("save account error " + e.Error())
+	}
 }
