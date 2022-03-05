@@ -22,7 +22,9 @@ func AccountLogin(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loginHandler.AccountLogin(&requestData))
+	body, token := requestData.AccountLogin()
+	c.Header(data.KeyAccountToken, token)
+	c.JSON(http.StatusOK, body)
 }
 
 func Register(c *gin.Context) {
@@ -37,7 +39,15 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loginHandler.Register(&requestData))
+	c.JSON(http.StatusOK, requestData.Register())
+}
+
+func TestToken(c *gin.Context) {
+	token := c.GetHeader(data.KeyAccountToken)
+	if token != "" {
+		accountData := utils.ParseAccountIdToken(token)
+		fmt.Println("token test ", accountData.AccountId, accountData.ExpiresAt)
+	}
 }
 
 func PhoneLogin(c *gin.Context) {
@@ -60,13 +70,13 @@ func PhoneLogin(c *gin.Context) {
 
 	if phone != nil {
 		fmt.Println("phone is not null, ", phone)
-		_, err := initDB.Db.Exec("UPDATE account set last_login_time=? where phone=?", dataHelper.GetCurrentDataTimeToDb(), requestData.PhoneNum)
+		_, err := initDB.Db.Exec("UPDATE account set last_login_time=? where phone=?", utils.GetCurrentDataTimeToDb(), requestData.PhoneNum)
 		if err != nil {
 			fmt.Println("update error ", err.Error())
 			return
 		}
 	} else {
-		_, e := initDB.Db.Exec("insert into account(phone , last_login_time) values (?,?);", requestData.PhoneNum, dataHelper.GetCurrentDataTimeToDb())
+		_, e := initDB.Db.Exec("insert into account(phone , last_login_time) values (?,?);", requestData.PhoneNum, utils.GetCurrentDataTimeToDb())
 		if e != nil {
 			fmt.Println("save account error " + e.Error())
 		}

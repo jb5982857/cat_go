@@ -3,6 +3,7 @@ package loginHandler
 import (
 	"cat/data"
 	"cat/initDB"
+	"cat/utils"
 	dataHelper "cat/utils"
 	"fmt"
 	"strings"
@@ -18,7 +19,7 @@ type AccountRequest struct {
 	Password string `json:"password"`
 }
 
-func Register(account *AccountRequest) data.BaseResponseData {
+func (account *AccountRequest) Register() data.BaseResponseData {
 	count := 0
 	queryErr := initDB.Db.QueryRow("SELECT COUNT(*) from account where username=?", account.Username).Scan(&count)
 	if queryErr != nil {
@@ -52,26 +53,37 @@ func Register(account *AccountRequest) data.BaseResponseData {
 	}
 }
 
-func AccountLogin(account *AccountRequest) data.BaseResponseData {
-	dbAccount := ""
-	err := initDB.Db.QueryRow("SELECT username from account where username=? and password=? LIMIT 1", account.Username, strings.ToLower(account.Password)).Scan(&dbAccount)
+func (account *AccountRequest) AccountLogin() (data.BaseResponseData, string) {
+	accountId := 0
+	err := initDB.Db.QueryRow("SELECT account_id from account where username=? and password=? LIMIT 1", account.Username, strings.ToLower(account.Password)).Scan(&accountId)
 	if err != nil {
 		return data.BaseResponseData{
 			Code: data.CodeDbFailed,
 			Msg:  "登录失败",
-		}
+		}, ""
 	}
 
-	if dbAccount != "" {
+	if accountId > 0 {
 		initDB.Db.Exec("UPDATE account set last_login_time=?", dataHelper.GetCurrentDataTimeToDb())
+		token := utils.GetAccountIdJwtToken(&data.AccountJwtData{
+			AccountId: accountId,
+		})
+
+		if token == "" {
+			return data.BaseResponseData{
+				Code: data.CodeTokenFailed,
+				Msg:  "登录失败",
+			}, ""
+		}
+
 		return data.BaseResponseData{
 			Code: data.CodeSuccess,
 			Msg:  "登录成功",
-		}
+		}, token
 	}
 
 	return data.BaseResponseData{
 		Code: data.CodeFailed,
 		Msg:  "账号密码错误",
-	}
+	}, ""
 }

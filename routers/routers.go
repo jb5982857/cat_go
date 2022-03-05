@@ -13,6 +13,7 @@ func Router() *gin.Engine {
 		s.POST(data.PhoneLogin, account.PhoneLogin)
 		s.POST(data.AccountLogin, account.AccountLogin)
 		s.POST(data.Register, account.Register)
+		s.POST(data.TestToken, account.TestToken)
 	}
 	return r
 }
