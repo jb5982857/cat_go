@@ -22,8 +22,7 @@ func AccountLogin(c *gin.Context) {
 		return
 	}
 
-	body, token := requestData.AccountLogin()
-	c.Header(data.KeyAccountToken, token)
+	body := requestData.AccountLogin()
 	c.JSON(http.StatusOK, body)
 }
 

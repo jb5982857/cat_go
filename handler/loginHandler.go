@@ -53,14 +53,14 @@ func (account *AccountRequest) Register() data.BaseResponseData {
 	}
 }
 
-func (account *AccountRequest) AccountLogin() (data.BaseResponseData, string) {
+func (account *AccountRequest) AccountLogin() data.BaseResponseData {
 	accountId := 0
 	err := initDB.Db.QueryRow("SELECT account_id from account where username=? and password=? LIMIT 1", account.Username, strings.ToLower(account.Password)).Scan(&accountId)
 	if err != nil {
 		return data.BaseResponseData{
 			Code: data.CodeDbFailed,
 			Msg:  "登录失败",
-		}, ""
+		}
 	}
 
 	if accountId > 0 {
@@ -73,17 +73,19 @@ func (account *AccountRequest) AccountLogin() (data.BaseResponseData, string) {
 			return data.BaseResponseData{
 				Code: data.CodeTokenFailed,
 				Msg:  "登录失败",
-			}, ""
+			}
 		}
 
+		respData := map[string]string{data.KeyAccountToken: token}
 		return data.BaseResponseData{
 			Code: data.CodeSuccess,
 			Msg:  "登录成功",
-		}, token
+			Data: respData,
+		}
 	}
 
 	return data.BaseResponseData{
 		Code: data.CodeFailed,
 		Msg:  "账号密码错误",
-	}, ""
+	}
 }
