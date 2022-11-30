@@ -16,7 +16,7 @@ func init() {
 }
 
 func initDb() {
-	database, err := sql.Open("mysql", "jb5982857:wobuailq99@tcp(rm-2vc000gt370tk69pj4o.mysql.cn-chengdu.rds.aliyuncs.com:3306)/cat")
+	database, err := sql.Open("mysql", "root:your_password@tcp(110.185.185.119:3306)/cat")
 	if err != nil {
 		log.Panicln("init mysql err:", err.Error())
 	}
